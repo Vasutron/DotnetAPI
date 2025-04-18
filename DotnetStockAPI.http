@@ -4,3 +4,22 @@ GET {{DotnetStockAPI_HostAddress}}/Authenticate/testconnectdb
 Accept: application/json
 
 ###
+
+POST {{DotnetStockAPI_HostAddress}}/Authenticate/register-user
+Content-Type: application/json
+
+{
+    "username": "Testdev2",
+    "email": "Testdev2@email.com",
+    "password": "Testdev2@123"
+}
+
+###
+
+POST {{DotnetStockAPI_HostAddress}}/Authenticate/login
+Content-Type: application/json
+
+{
+    "username": "Testdev2",
+    "password": "Testdev2@123"
+}
