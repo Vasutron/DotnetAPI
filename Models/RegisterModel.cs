@@ -4,7 +4,7 @@ namespace DotnetStockAPI.Models;
 
 public class RegisterModel
 {
-    [Required(ErrorMessage = "Username is required")]
+    [Required(ErrorMessage = "Username is required")] // การทำการ Validate ข้อมูลที่รับเข้ามา ผ่าน Model
     [StringLength(50, ErrorMessage = "Username is too long")]
     [MinLength(3, ErrorMessage = "Username is too short")]
     public required string Username { get; set; }
