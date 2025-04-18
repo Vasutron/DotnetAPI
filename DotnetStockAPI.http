@@ -4,8 +4,37 @@ GET {{DotnetStockAPI_HostAddress}}/Authenticate/testconnectdb
 Accept: application/json
 
 ###
+POST {{DotnetStockAPI_HostAddress}}/Authenticate/login
+Content-Type: application/json
 
+{
+    "username": "User4",
+    "password": "User4@123"
+}
+
+###
+POST {{DotnetStockAPI_HostAddress}}/Authenticate/logout
+
+###
+POST {{DotnetStockAPI_HostAddress}}/Authenticate/refresh-token
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiVXNlcjQiLCJqdGkiOiI3ZDc2MDc2Ny01NWZhLTQ0NTMtYTdhZi1lZGZhOGVkNGZkNmYiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJVc2VyIiwiZXhwIjoxNzQ0OTc5ODYzLCJpc3MiOiIqIiwiYXVkIjoiKiJ9.8QarcnT1t4CyuLXRZLk1NeJy-jvXNsV_wkWL9-_C9Rg"
+}
+
+###
 POST {{DotnetStockAPI_HostAddress}}/Authenticate/register-user
+Content-Type: application/json
+
+{
+    "username": "User4",
+    "email": "User4@email.com",
+    "password": "User4@123"
+}
+
+###
+POST {{DotnetStockAPI_HostAddress}}/Authenticate/register-manager
 Content-Type: application/json
 
 {
@@ -15,11 +44,13 @@ Content-Type: application/json
 }
 
 ###
-
-POST {{DotnetStockAPI_HostAddress}}/Authenticate/login
+POST {{DotnetStockAPI_HostAddress}}/Authenticate/register-admin
 Content-Type: application/json
 
 {
-    "username": "Testdev2",
-    "password": "Testdev2@123"
+    "username": "User4",
+    "email": "User4@email.com",
+    "password": "User4@123"
 }
+
+###
