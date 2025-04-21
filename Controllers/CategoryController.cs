@@ -1,8 +1,13 @@
 using DotnetStockAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetStockAPI.Controllers;
 
+// [Authorize]  // All Roles
+
+// Multiple Roles
+[Authorize(Roles = UserRolesModel.Admin + "," + UserRolesModel.Manager)]
 [ApiController]
 [Route("api/[controller]")]
 public class CategoryController : ControllerBase

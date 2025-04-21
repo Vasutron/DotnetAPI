@@ -24,4 +24,5 @@ This project demonstrates building a .NET Web API using C# for managing stock da
 2. Configure the database connection in `appsettings.json`.
 3. Run the application using `dotnet run`.
 
-#### Path Day 6 : Time 1:17:55
+
+#### Path Day 6 : Time 2:04:53
