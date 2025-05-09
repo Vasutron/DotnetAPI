@@ -4,6 +4,7 @@ using DotnetStockAPI.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -41,6 +42,51 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration.GetSection("JWT:ValidIssuer").Value!,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWT:Secret").Value!))
     };
+});
+
+// Allow CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MultipleOrigins",
+    policy =>
+    {
+        policy.WithOrigins(
+            // "*", // Allow all origins
+            "http://localhost:3000", // React app
+            "http://localhost:5173", // Vite app
+            "http://localhost:8080", // Vue app
+            "http://localhost:8081", // Angular app
+            "http://localhost:4200", // Angular app
+            "http://localhost:8082", // Svelte app
+            "http://localhost:8083", // Ember app
+            "http://localhost:8084", // Backbone app
+            "http://localhost:8085", // Preact app
+            "http://localhost:8086", // Lit app
+            "http://localhost:8087", // Alpine app
+            "http://localhost:8088", // Solid app
+            "http://localhost:8089", // Astro app
+            "http://localhost:8090", // Qwik app
+            "http://localhost:8091", // SvelteKit app
+            "http://localhost:8092", // Remix app
+            "http://localhost:8093", // Next.js app
+            "http://localhost:8094", // Laravel app
+            "http://localhost:8095", // Django app
+            "http://localhost:8096", // Flask app
+            "http://*.azurewebsites.net", // Azure app
+            "http://*.herokuapp.com", // Heroku app
+            "http://*.ngrok.io", // ngrok app   
+            "http://*.vercel.app", // Vercel app
+            "http://*.netlify.app", // Netlify app
+            "http://*.surge.sh", // Surge app
+            "http://*.github.io", // GitHub Pages app
+            "http://*.gitlab.io", // GitLab Pages app
+            "http://*.bitbucket.io", // Bitbucket Pages app
+            "http://*.bitbucket.org" // Bitbucket Pages app
+        )
+        .SetIsOriginAllowedToAllowWildcardSubdomains()
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    });
 });
 
 builder.Services.AddControllers();
@@ -90,6 +136,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// User CORS
+app.UseCors("MultipleOrigins");
 
 // Add Authentication
 app.UseAuthentication();

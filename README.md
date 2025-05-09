@@ -25,4 +25,4 @@ This project demonstrates building a .NET Web API using C# for managing stock da
 3. Run the application using `dotnet run`.
 
 
-#### Path Day 6 : Time 2:04:53
+#### Path Day 6 : End Path6

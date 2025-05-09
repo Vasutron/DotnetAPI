@@ -1,5 +1,6 @@
 using DotnetStockAPI.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetStockAPI.Controllers;
@@ -10,6 +11,7 @@ namespace DotnetStockAPI.Controllers;
 [Authorize(Roles = UserRolesModel.Admin + "," + UserRolesModel.Manager)]
 [ApiController]
 [Route("api/[controller]")]
+[EnableCors("MultipleOrigins")]
 public class CategoryController : ControllerBase
 {
     // สร้าง Object ของ ApplicationDbContext

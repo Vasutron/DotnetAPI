@@ -1,13 +1,15 @@
 using DotnetStockAPI.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotnetStockAPI.Controllers;
 
-// [Authorize]
+[Authorize] // ต้องมีการ Login ก่อนถึงจะเข้าถึง API นี้ได้
 [ApiController]
 [Route("api/[controller]")]
+[EnableCors("MultipleOrigins")]
 public class ProductController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
