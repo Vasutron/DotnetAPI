@@ -1,6 +1,7 @@
 using DotnetStockAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DotnetStockAPI.Controllers;
 
@@ -22,15 +23,23 @@ public class ProductController : ControllerBase
     // Function ดึงข้อมูล Product
     // GET: api/product
     [HttpGet]
-    public ActionResult<product> GetProducts()
+    public ActionResult<product> GetProducts(
+        [FromQuery] int page = 1,
+        [FromQuery] int limit = 2,
+        [FromQuery] string? searchQuery = null,
+        [FromQuery] int? selectedCategory = null
+    )
     {
+        // script แบ่งหน้า (skip)
+        var skip = (page - 1) * limit;
         // var product = _context.products.ToList();
 
         // where แบบมีเงื่อนไข
         // var product = _context.products.Where(p => p.unitinstock > 10).ToList(); // เหมือนใช้ Select * from products ใน SQL
         
         // join table product and category
-        var product = _context.products
+        // var product = _context.products
+        var query = _context.products
         .Join(
             _context.categories,
             p => p.categoryid,
@@ -49,7 +58,33 @@ public class ProductController : ControllerBase
             }
         );
 
-        return Ok(product);
+        // ถ้ามีการค้นหา
+        if (!string.IsNullOrEmpty(searchQuery))
+        {
+            query = query.Where(p => EF.Functions.ILike(p.productname!, $"%{searchQuery}%"));
+        }
+
+        // ถ้ามีการค้นหาตามหมวดหมู่
+        if (selectedCategory.HasValue)
+        {
+            query = query.Where(p => p.categoryid == selectedCategory.Value);
+        }
+
+        // นับจำนวนข้อมูลทั้งหมด
+        var totalRecords = query.Count();
+
+        var product = query
+        .OrderByDescending(p => p.productid)
+        .Skip(skip)
+        .Take(limit)
+        .ToList();
+
+        return Ok(
+            new {
+                Total = totalRecords,
+                Products = product
+            }
+        );
     }
 
     [HttpGet("{id}")]
