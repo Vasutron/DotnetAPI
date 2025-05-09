@@ -164,25 +164,56 @@ public class ProductController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public ActionResult<product> UpdateProduct(int id, [FromBody] product product)
+    public async Task<ActionResult<product>> UpdateProduct(int id, [FromForm] product product, IFormFile? image)
     {
-        var productData = _context.products.Find(id);
+        // var productData = _context.products.Find(id);
+        var existingProduct = _context.products.FirstOrDefault(p => p.productid == id);
 
-        if (productData == null)
+        if (existingProduct == null)
         {
             return NotFound();
         }
 
-        productData.productname = product.productname;
-        productData.unitprice = product.unitprice;
-        productData.unitinstock = product.unitinstock;
-        productData.produnctpicture = product.produnctpicture;
-        productData.categoryid = product.categoryid;
-        productData.modifieddate = DateTime.Now;
+        // แก้ไขข้อมูลของ product
+        existingProduct.productname = product.productname;
+        existingProduct.unitprice = product.unitprice;
+        existingProduct.unitinstock = product.unitinstock;
+        existingProduct.categoryid = product.categoryid;
+        existingProduct.modifieddate = DateTime.Now;
+
+        // ถ้ามีการอัพโหลดไฟล์
+        if (image != null)
+        {
+            // กำหนดชื่อรูปภาพใหม่
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+
+
+            // บกำหนดเส้นทางไปยังโฟลเดอร์ uploads
+            string uploadFolder = Path.Combine(_env.WebRootPath, "uploads");
+
+            // ตรวจสอบว่าโฟลเดอร์ uploads มีอยู่หรือไม่ ถ้าไม่มีให้สร้าง
+            if (!Directory.Exists(uploadFolder))
+            {
+                Directory.CreateDirectory(uploadFolder);
+            }
+
+            using (var fileStream = new FileStream(Path.Combine(uploadFolder, fileName), FileMode.Create))
+            {
+                await image.CopyToAsync(fileStream);
+            }
+
+            // ลบไฟล์เก่าออก ถ้ามีการอัพโหลดไฟล์ใหม่
+            if(existingProduct.produnctpicture != "noimg.png")
+            {
+                System.IO.File.Delete(Path.Combine(uploadFolder, existingProduct.produnctpicture));
+            }
+
+            existingProduct.produnctpicture = fileName;
+        }
 
         _context.SaveChanges();
 
-        return Ok(productData);
+        return Ok(existingProduct);
     }
 
     [HttpDelete("{id}")]
@@ -193,6 +224,16 @@ public class ProductController : ControllerBase
         if (product == null)
         {
             return NotFound();
+        }
+
+        // ตรวจสอบว่าไฟล์มีอยู่ในโฟลเดอร์ uploads หรือไม่
+        if (product.produnctpicture != "noimg.png")
+        {
+            string uploadFolder = Path.Combine(_env.WebRootPath, "uploads");
+
+            // ลบไฟลล์รูปภาพ
+            System.IO.File.Delete(Path.Combine(uploadFolder, product.produnctpicture));
+
         }
 
         _context.products.Remove(product);
