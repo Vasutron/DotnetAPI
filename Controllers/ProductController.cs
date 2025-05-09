@@ -12,10 +12,16 @@ public class ProductController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
 
+    // IWebHostEnvironment คืออะไร
+    // ContentRootPath คือ path ที่เก็บไฟล์ของโปรเจค
+    // WebRootPath คือ path ที่เก็บไฟล์ static เช่น wwwroot ของเว็บแอปพลิเคชัน
+    private readonly IWebHostEnvironment _env;
+
     // Constructor
-    public ProductController(ApplicationDbContext context)
+    public ProductController(ApplicationDbContext context, IWebHostEnvironment env)
     {
         _context = context;
+        _env = env;
     }
 
     // เริ่มต้นสร้าง CRUD API สำหรับ Product
@@ -90,7 +96,29 @@ public class ProductController : ControllerBase
     [HttpGet("{id}")]
     public ActionResult<product> GetProduct(int id)
     {
-        var product = _context.products.Find(id);
+        // var product = _context.products.Find(id);
+
+        var product = _context.products
+        .Join(
+            _context.categories,
+            p => p.categoryid,
+            c => c.categoryid,
+            (p, c) => new 
+            {
+                p.productid,
+                p.productname,
+                p.unitprice,
+                p.unitinstock,
+                p.produnctpicture,
+                c.categoryname,
+                c.categoryid,
+                p.createddate,
+                p.modifieddate
+            }
+        )
+        .FirstOrDefault(p => p.productid == id);
+
+
         if (product == null)
         {
             return NotFound();
@@ -99,9 +127,37 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<product> CreateProduct([FromBody] product product)
+    public async Task<ActionResult<product>> CreateProduct([FromForm] product product, IFormFile? image)
     {
         _context.products.Add(product);
+
+        // ถ้ามีการอัพโหลดไฟล์
+        if (image != null)
+        {
+            // กำหนดชื่อรูปภาพใหม่
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+
+
+            // บกำหนดเส้นทางไปยังโฟลเดอร์ uploads
+            string uploadFolder = Path.Combine(_env.WebRootPath, "uploads");
+
+            // ตรวจสอบว่าโฟลเดอร์ uploads มีอยู่หรือไม่ ถ้าไม่มีให้สร้าง
+            if (!Directory.Exists(uploadFolder))
+            {
+                Directory.CreateDirectory(uploadFolder);
+            }
+
+            using (var fileStream = new FileStream(Path.Combine(uploadFolder, fileName), FileMode.Create))
+            {
+                await image.CopyToAsync(fileStream);
+            }
+
+            product.produnctpicture = fileName;
+        } else
+        {
+            product.produnctpicture = "noimg.png";
+        }
+
         _context.SaveChanges();
 
         return Ok(product);
